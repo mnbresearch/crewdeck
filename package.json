@@ -1,0 +1,14 @@
+{
+  "name": "crewdeck",
+  "version": "1.0.0",
+  "description": "Mission control for AI agents: org chart, task board with locks & dependencies, budgets with hard stops, approvals, routines and an audit trail. Zero dependencies.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Mridul Nanda (MNB Research / Abrobot.ai)",
+  "repository": { "type": "git", "url": "https://github.com/mnbresearch/crewdeck.git" },
+  "homepage": "https://mnbresearch.github.io/crewdeck/",
+  "bin": { "crewdeck": "crewdeck.mjs", "crewdeck-agent": "agent.mjs" },
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node crewdeck.mjs", "demo": "node crewdeck.mjs --demo", "test": "node --test tests/*.test.mjs" },
+  "keywords": ["ai-agents", "agent-orchestration", "claude-code", "codex", "multi-agent", "kanban", "budgets", "llm-ops"]
+}
