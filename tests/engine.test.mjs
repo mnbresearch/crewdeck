@@ -25,6 +25,32 @@ test('dispatch respects priority, blockers and one-task-per-agent', () => {
   assert.ok(E.isBlocked(s, t2));
 });
 
+test('manual claim cannot start a second concurrent task for the same agent', () => {
+  const { s, a } = setup();
+  const first = E.createTask(s, { title: 'first', assignee: a.id });
+  const second = E.createTask(s, { title: 'second', assignee: a.id });
+  const { run } = E.claim(s, first.id, a.id);
+  assert.throws(() => E.claim(s, second.id, a.id), /agent already running a task/);
+  assert.equal(second.status, 'todo');
+  assert.equal(second.lock, null);
+  E.completeRun(s, run.id, { ok: true });
+  assert.doesNotThrow(() => E.claim(s, second.id, a.id));
+});
+
+test('manual claim cannot rerun completed or awaiting-approval work', () => {
+  const { s, a } = setup();
+  const complete = E.createTask(s, { title: 'complete', assignee: a.id });
+  const approved = E.createTask(s, { title: 'review', assignee: a.id, requiresApproval: true });
+  const r1 = E.claim(s, complete.id, a.id).run;
+  E.completeRun(s, r1.id, { ok: true });
+  const r2 = E.claim(s, approved.id, a.id).run;
+  E.completeRun(s, r2.id, { ok: true });
+  assert.throws(() => E.claim(s, complete.id, a.id), /task is not ready/);
+  assert.throws(() => E.claim(s, approved.id, a.id), /task is not ready/);
+  assert.equal(complete.status, 'done');
+  assert.equal(approved.status, 'review');
+});
+
 test('budget hard stop pauses dispatch', () => {
   const { s, a } = setup();
   const t = E.createTask(s, { title: 'expensive', assignee: a.id });
